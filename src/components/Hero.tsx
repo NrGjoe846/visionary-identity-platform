@@ -1,6 +1,7 @@
 
-import { ArrowRight, Download, Briefcase, Mail } from "lucide-react";
+import { ArrowRight, Download, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -8,6 +9,51 @@ const Hero = () => {
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const handleDownloadResume = async () => {
+    try {
+      // Google Docs published link (change to "export?format=pdf" to get PDF directly)
+      const resumeUrl = "https://docs.google.com/document/d/17GmTQ-Tprs2JqH4Lryh8eguUaqjvDVvnViAFtAD0ZFQ/export?format=pdf";
+      
+      // Fetch the PDF file
+      const response = await fetch(resumeUrl);
+      
+      if (!response.ok) {
+        throw new Error("Failed to download resume");
+      }
+      
+      // Convert response to blob
+      const blob = await response.blob();
+      
+      // Create a temporary URL for the blob
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      // Create a temporary link element
+      const downloadLink = document.createElement("a");
+      downloadLink.href = blobUrl;
+      downloadLink.download = "Nehemiah_Nesanathan_Resume.pdf";
+      
+      // Append link to body, click it, and remove it
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      // Revoke the blob URL to free up memory
+      window.URL.revokeObjectURL(blobUrl);
+      
+      toast({
+        title: "Resume downloaded!",
+        description: "Thanks for your interest in my profile.",
+      });
+    } catch (error) {
+      console.error("Error downloading resume:", error);
+      toast({
+        title: "Download failed",
+        description: "Please try again later or contact me directly.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <section 
@@ -41,9 +87,12 @@ const Hero = () => {
             <a href="#projects" className="button-primary flex items-center gap-2">
               View My Projects <ArrowRight size={18} />
             </a>
-            <a href="#" className="button-secondary flex items-center gap-2">
+            <button 
+              onClick={handleDownloadResume} 
+              className="button-secondary flex items-center gap-2"
+            >
               Download Resume <Download size={18} />
-            </a>
+            </button>
           </div>
           
           <div className="flex items-center gap-6 mt-12">
