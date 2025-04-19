@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,34 +6,34 @@
 
 @layer base {
   :root {
-    --background: 261 29% 13%;
-    --foreground: 0 0% 98%;
-
-    --card: 260 29% 13%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 260 29% 13%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 267 68% 58%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 96%;
+    
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 96%;
+    
+    --primary: 51 100% 50%;
     --primary-foreground: 0 0% 100%;
-
-    --secondary: 260 18% 8%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 260 10% 20%;
+    
+    --secondary: 0 0% 75%;
+    --secondary-foreground: 0 0% 4%;
+    
+    --muted: 0 0% 15%;
     --muted-foreground: 0 0% 70%;
-
-    --accent: 267 68% 58%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 260 10% 20%;
-    --input: 260 10% 20%;
-    --ring: 267 68% 58%;
-
+    
+    --accent: 51 100% 50%;
+    --accent-foreground: 0 0% 4%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 96%;
+    
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 51 100% 50%;
+    
     --radius: 0.5rem;
   }
 
@@ -47,33 +46,29 @@
   }
 
   body {
-    @apply bg-dark-purple text-foreground font-poppins antialiased overflow-x-hidden;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-poppins font-bold;
-  }
-
-  section {
-    @apply py-16 md:py-24;
-  }
-
-  .container {
-    @apply px-4 md:px-8 max-w-screen-xl mx-auto;
+    @apply bg-royal-black text-off-white font-poppins antialiased overflow-x-hidden;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-gradient-card border border-white/10 backdrop-blur-lg;
+    @apply bg-gradient-dark border border-golden/20 backdrop-blur-lg;
   }
 
   .button-primary {
-    @apply bg-gradient-purple text-white font-semibold px-6 py-3 rounded-md hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-bright-purple/20;
+    @apply bg-gradient-royal text-royal-black font-semibold px-6 py-3 rounded-md hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-golden/20;
   }
 
   .button-secondary {
-    @apply bg-transparent border border-bright-purple text-white font-semibold px-6 py-3 rounded-md hover:bg-bright-purple/10 transition-all duration-300;
+    @apply bg-transparent border border-golden text-off-white font-semibold px-6 py-3 rounded-md hover:bg-golden/10 transition-all duration-300;
+  }
+
+  .text-gradient-purple {
+    @apply bg-gradient-royal text-transparent bg-clip-text;
+  }
+
+  .text-gradient-gold {
+    @apply bg-gradient-royal text-transparent bg-clip-text;
   }
 
   .section-title {
@@ -81,31 +76,23 @@
   }
 
   .section-title::after {
-    @apply content-[''] absolute -bottom-2 left-0 w-12 h-1 bg-gradient-purple rounded-full;
+    @apply content-[''] absolute -bottom-2 left-0 w-12 h-1 bg-gradient-royal rounded-full;
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl hover:shadow-bright-purple/20;
+    @apply transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl hover:shadow-golden/20;
   }
 
   .nav-link {
-    @apply relative text-white/80 hover:text-white transition-colors duration-300 after:content-[''] after:absolute after:w-0 after:h-0.5 after:bg-gradient-purple after:left-0 after:-bottom-1 after:transition-all after:duration-300 hover:after:w-full;
+    @apply relative text-off-white/80 hover:text-off-white transition-colors duration-300 after:content-[''] after:absolute after:w-0 after:h-0.5 after:bg-gradient-royal after:left-0 after:-bottom-1 after:transition-all after:duration-300 hover:after:w-full;
   }
 
   .nav-link.active {
-    @apply text-white after:w-full;
+    @apply text-off-white after:w-full;
   }
 }
 
 @layer utilities {
-  .text-gradient-purple {
-    @apply bg-gradient-purple text-transparent bg-clip-text;
-  }
-
-  .text-gradient-gold {
-    @apply bg-gradient-gold text-transparent bg-clip-text;
-  }
-
   .animate-delay-100 {
     animation-delay: 100ms;
   }

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,10 +62,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        dark: "#0D0D0F",
-        "dark-purple": "#1E1A2B",
-        "bright-purple": "#9D4EDD",
-        "light-purple": "#C77DFF",
+        'royal-black': '#0A0A0A',
+        'off-white': '#F5F5F5',
+        'golden': '#FFD700',
+        'silver': '#C0C0C0',
+        'dark': '#121212',
+        'dark-purple': '#0A0A0A',
+        'bright-purple': '#FFD700',
+        'light-purple': '#C0C0C0',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -140,6 +143,8 @@ export default {
           "linear-gradient(135deg, #1E1A2B 0%, #0D0D0F 100%)",
         "gradient-card":
           "linear-gradient(135deg, rgba(157, 78, 221, 0.1) 0%, rgba(199, 125, 255, 0.1) 100%)",
+        'gradient-royal': 'linear-gradient(135deg, #FFD700 0%, #C0C0C0 100%)',
+        'gradient-dark': 'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%)',
       },
     },
   },
