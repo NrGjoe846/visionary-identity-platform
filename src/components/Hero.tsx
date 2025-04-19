@@ -1,65 +1,54 @@
-
 import { ArrowRight, Download, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
-
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
-
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
   const handleDownloadResume = async () => {
     try {
       // Google Docs published link (change to "export?format=pdf" to get PDF directly)
       const resumeUrl = "https://docs.google.com/document/d/17GmTQ-Tprs2JqH4Lryh8eguUaqjvDVvnViAFtAD0ZFQ/export?format=pdf";
-      
+
       // Fetch the PDF file
       const response = await fetch(resumeUrl);
-      
       if (!response.ok) {
         throw new Error("Failed to download resume");
       }
-      
+
       // Convert response to blob
       const blob = await response.blob();
-      
+
       // Create a temporary URL for the blob
       const blobUrl = window.URL.createObjectURL(blob);
-      
+
       // Create a temporary link element
       const downloadLink = document.createElement("a");
       downloadLink.href = blobUrl;
       downloadLink.download = "Nehemiah_Nesanathan_Resume.pdf";
-      
+
       // Append link to body, click it, and remove it
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
-      
+
       // Revoke the blob URL to free up memory
       window.URL.revokeObjectURL(blobUrl);
-      
       toast({
         title: "Resume downloaded!",
-        description: "Thanks for your interest in my profile.",
+        description: "Thanks for your interest in my profile."
       });
     } catch (error) {
       console.error("Error downloading resume:", error);
       toast({
         title: "Download failed",
         description: "Please try again later or contact me directly.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
-  return (
-    <section 
-      id="home" 
-      className="relative min-h-screen flex items-center pt-20 overflow-hidden"
-    >
+  return <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
       {/* Background elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-bright-purple/10 blur-3xl -z-10"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-bright-purple/5 blur-3xl -z-10"></div>
@@ -87,19 +76,13 @@ const Hero = () => {
             <a href="#projects" className="button-primary flex items-center gap-2">
               View My Projects <ArrowRight size={18} />
             </a>
-            <button 
-              onClick={handleDownloadResume} 
-              className="button-secondary flex items-center gap-2"
-            >
+            <button onClick={handleDownloadResume} className="button-secondary flex items-center gap-2">
               Download Resume <Download size={18} />
             </button>
           </div>
           
           <div className="flex items-center gap-6 mt-12">
-            <a 
-              href="#contact" 
-              className="flex items-center gap-2 text-white hover:text-bright-purple transition-colors"
-            >
+            <a href="#contact" className="flex items-center gap-2 text-white hover:text-bright-purple transition-colors">
               <Mail size={20} /> nehemiahnesanathan@gmail.com
             </a>
           </div>
@@ -113,11 +96,7 @@ const Hero = () => {
               
               {/* Placeholder for profile image */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/5ddceec4-71cf-4821-b213-469128d3e7ff.png"
-                  alt="Nehemiah Nesanathan" 
-                  className="w-full h-full object-cover"
-                />
+                <img alt="Nehemiah Nesanathan" className="w-full h-full object-cover" src="/lovable-uploads/84957f1a-5d8b-49e0-a315-0ddc03bf0617.jpg" />
               </div>
             </div>
             
@@ -136,8 +115,6 @@ const Hero = () => {
           <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-bounce"></div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;
