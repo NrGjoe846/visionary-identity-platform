@@ -1,15 +1,46 @@
 
 import { useState, useEffect, useRef } from "react";
+import { Code, Brain, Database, Globe, Lightbulb, Users } from "lucide-react";
 
-interface SkillBarProps {
-  label: string;
-  percentage: number;
-  color: string;
+interface SkillCardProps {
+  icon: React.ReactNode;
+  title: string;
+  skills: string[];
   delay: number;
   isVisible: boolean;
 }
 
-const SkillBar = ({ label, percentage, color, delay, isVisible }: SkillBarProps) => {
+const SkillCard = ({ icon, title, skills, delay, isVisible }: SkillCardProps) => {
+  return (
+    <div className={`glass-card p-6 rounded-xl border border-golden/20 transition-all duration-700 delay-${delay} ${
+      isVisible ? "opacity-100" : "opacity-0 translate-y-8"
+    } hover:transform hover:scale-105 hover:shadow-xl hover:shadow-golden/20 group`}>
+      <div className="w-16 h-16 rounded-xl bg-golden/10 flex items-center justify-center text-golden mb-6 group-hover:scale-110 transition-transform duration-300">
+        {icon}
+      </div>
+      <h3 className="text-xl font-bold mb-4">{title}</h3>
+      <div className="flex flex-wrap gap-2">
+        {skills.map((skill, index) => (
+          <span 
+            key={index}
+            className="px-3 py-1 text-sm rounded-full bg-royal-black border border-golden/20 text-golden hover:bg-golden/10 transition-colors duration-300"
+          >
+            {skill}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+interface ProgressBarProps {
+  skill: string;
+  percentage: number;
+  delay: number;
+  isVisible: boolean;
+}
+
+const ProgressBar = ({ skill, percentage, delay, isVisible }: ProgressBarProps) => {
   const [width, setWidth] = useState(0);
 
   useEffect(() => {
@@ -17,45 +48,24 @@ const SkillBar = ({ label, percentage, color, delay, isVisible }: SkillBarProps)
       const timer = setTimeout(() => {
         setWidth(percentage);
       }, delay);
-      
       return () => clearTimeout(timer);
     }
   }, [isVisible, percentage, delay]);
 
   return (
-    <div className="mb-6">
-      <div className="flex justify-between mb-2">
-        <span className="font-medium">{label}</span>
-        <span className="text-white/70">{percentage}%</span>
+    <div className={`mb-6 transition-all duration-700 delay-${delay} ${
+      isVisible ? "opacity-100" : "opacity-0 translate-x-8"
+    }`}>
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-off-white font-medium">{skill}</span>
+        <span className="text-golden text-sm">{percentage}%</span>
       </div>
-      <div className="h-3 w-full bg-dark/50 rounded-full overflow-hidden">
+      <div className="w-full bg-royal-black/50 rounded-full h-2 border border-golden/20">
         <div 
-          className={`h-full ${color} transition-all duration-1000 ease-out`}
+          className="h-full bg-gradient-royal rounded-full transition-all duration-1000 ease-out"
           style={{ width: `${width}%` }}
         ></div>
       </div>
-    </div>
-  );
-};
-
-interface SkillIconProps {
-  icon: string;
-  label: string;
-  delay: number;
-  isVisible: boolean;
-}
-
-const SkillIcon = ({ icon, label, delay, isVisible }: SkillIconProps) => {
-  return (
-    <div 
-      className={`flex flex-col items-center transition-all duration-700 delay-${delay} ${
-        isVisible ? "opacity-100" : "opacity-0 translate-y-8"
-      }`}
-    >
-      <div className="w-16 h-16 rounded-xl glass-card flex items-center justify-center mb-3">
-        <img src={icon} alt={label} className="w-8 h-8" />
-      </div>
-      <span className="text-sm font-medium">{label}</span>
     </div>
   );
 };
@@ -84,94 +94,116 @@ const Skills = () => {
     };
   }, []);
 
+  const skillCategories = [
+    {
+      icon: <Code size={32} />,
+      title: "Programming Languages",
+      skills: ["Python", "JavaScript", "TypeScript", "C", "HTML/CSS", "SQL"],
+      delay: 100,
+    },
+    {
+      icon: <Brain size={32} />,
+      title: "AI & Machine Learning",
+      skills: ["TensorFlow", "Neural Networks", "NLP", "Computer Vision", "Deep Learning", "FinBERT"],
+      delay: 200,
+    },
+    {
+      icon: <Globe size={32} />,
+      title: "Web Development",
+      skills: ["React", "Node.js", "Express", "MongoDB", "Streamlit", "REST APIs"],
+      delay: 300,
+    },
+    {
+      icon: <Database size={32} />,
+      title: "Tools & Technologies",
+      skills: ["Git", "Docker", "AWS", "Google Cloud", "Jupyter", "VS Code"],
+      delay: 400,
+    },
+    {
+      icon: <Lightbulb size={32} />,
+      title: "Core Competencies",
+      skills: ["Problem Solving", "Algorithm Design", "Data Analysis", "Research", "Innovation"],
+      delay: 500,
+    },
+    {
+      icon: <Users size={32} />,
+      title: "Soft Skills",
+      skills: ["Leadership", "Teaching", "Communication", "Team Management", "Public Speaking"],
+      delay: 600,
+    },
+  ];
+
   const technicalSkills = [
-    { label: "Machine Learning", percentage: 90, color: "bg-gradient-purple" },
-    { label: "Python", percentage: 85, color: "bg-gradient-purple" },
-    { label: "Neural Networks", percentage: 80, color: "bg-gradient-purple" },
-    { label: "NLP", percentage: 75, color: "bg-gradient-purple" },
-  ];
-
-  const softSkills = [
-    { label: "Leadership", percentage: 95, color: "bg-gradient-gold" },
-    { label: "Problem Solving", percentage: 90, color: "bg-gradient-gold" },
-    { label: "Communication", percentage: 85, color: "bg-gradient-gold" },
-    { label: "Teamwork", percentage: 90, color: "bg-gradient-gold" },
-  ];
-
-  const tools = [
-    { icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg", label: "Python" },
-    { icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg", label: "TensorFlow" },
-    { icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg", label: "React" },
-    { icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg", label: "HTML" },
-    { icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg", label: "CSS" },
-    { icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg", label: "C" },
+    { skill: "Python", percentage: 90, delay: 100 },
+    { skill: "Machine Learning", percentage: 85, delay: 200 },
+    { skill: "React/JavaScript", percentage: 80, delay: 300 },
+    { skill: "AI Research", percentage: 85, delay: 400 },
+    { skill: "Database Management", percentage: 75, delay: 500 },
+    { skill: "Project Management", percentage: 88, delay: 600 },
   ];
 
   return (
-    <section
-      ref={sectionRef}
-      id="skills"
-      className="relative py-20 overflow-hidden"
-    >
+    <section ref={sectionRef} id="skills" className="relative py-20 overflow-hidden">
       {/* Background elements */}
-      <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] rounded-full bg-bright-purple/5 blur-3xl -z-10"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-golden/5 blur-3xl -z-10"></div>
+      <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] rounded-full bg-silver/5 blur-3xl -z-10"></div>
 
       <div className="container mx-auto">
         <div className="max-w-xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            My <span className="text-gradient-purple">Skills</span>
+            Skills & <span className="text-gradient-gold">Expertise</span>
           </h2>
-          <div className="w-20 h-1 bg-gradient-purple mx-auto mb-8 rounded-full"></div>
-          <p className="text-white/70">
-            My technical expertise and professional capabilities.
+          <div className="w-20 h-1 bg-gradient-royal mx-auto mb-8 rounded-full"></div>
+          <p className="text-silver/70">
+            A comprehensive overview of my technical skills and core competencies.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 mb-16">
-          <div>
-            <h3 className="text-2xl font-bold mb-6">Technical Skills</h3>
-            {technicalSkills.map((skill, index) => (
-              <SkillBar
-                key={index}
-                label={skill.label}
-                percentage={skill.percentage}
-                color={skill.color}
-                delay={index * 200}
-                isVisible={isVisible}
-              />
-            ))}
-          </div>
-          
-          <div>
-            <h3 className="text-2xl font-bold mb-6">Soft Skills</h3>
-            {softSkills.map((skill, index) => (
-              <SkillBar
-                key={index}
-                label={skill.label}
-                percentage={skill.percentage}
-                color={skill.color}
-                delay={index * 200 + 400}
-                isVisible={isVisible}
-              />
-            ))}
-          </div>
+        {/* Skill Categories */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+          {skillCategories.map((category, index) => (
+            <SkillCard
+              key={index}
+              icon={category.icon}
+              title={category.title}
+              skills={category.skills}
+              delay={category.delay}
+              isVisible={isVisible}
+            />
+          ))}
         </div>
 
-        <div className="mt-16">
-          <h3 className="text-2xl font-bold mb-8 text-center">
-            Tools & <span className="text-gradient-purple">Technologies</span>
+        {/* Technical Proficiency */}
+        <div className="max-w-4xl mx-auto">
+          <h3 className={`text-2xl font-bold mb-12 text-center transition-all duration-700 delay-100 ${
+            isVisible ? "opacity-100" : "opacity-0 translate-y-4"
+          }`}>
+            Technical <span className="text-gradient-gold">Proficiency</span>
           </h3>
-
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-6">
-            {tools.map((tool, index) => (
-              <SkillIcon
-                key={index}
-                icon={tool.icon}
-                label={tool.label}
-                delay={index * 100}
-                isVisible={isVisible}
-              />
-            ))}
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              {technicalSkills.slice(0, 3).map((skill, index) => (
+                <ProgressBar
+                  key={index}
+                  skill={skill.skill}
+                  percentage={skill.percentage}
+                  delay={skill.delay}
+                  isVisible={isVisible}
+                />
+              ))}
+            </div>
+            <div>
+              {technicalSkills.slice(3).map((skill, index) => (
+                <ProgressBar
+                  key={index}
+                  skill={skill.skill}
+                  percentage={skill.percentage}
+                  delay={skill.delay}
+                  isVisible={isVisible}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
