@@ -55,7 +55,7 @@ const Hero = () => {
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-            Hello, I'm <span className="text-gradient-gold">Nehemiah</span>
+            Hello, I'm <span className="text-gradient-gold">Jenish</span>
             <br />
             <span>AI Developer &</span>
             <br />
