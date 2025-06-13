@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -27,12 +26,14 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { name: "Home", href: "#home" },
-    { name: "About", href: "#about" },
-    { name: "Services", href: "#services" },
-    { name: "Projects", href: "#projects" },
-    { name: "Experience", href: "#experience" },
-    { name: "Contact", href: "#contact" },
+    { name: "Home", href: "/" },
+    { name: "About", href: "/#about" },
+    { name: "Services", href: "/#services" },
+    { name: "Portfolio", href: "/portfolio" },
+    { name: "Blog", href: "/blog" },
+    { name: "Resume", href: "/resume" },
+    { name: "Testimonials", href: "/testimonials" },
+    { name: "Contact", href: "/#contact" },
   ];
 
   return (
@@ -45,10 +46,10 @@ const Navbar = () => {
     >
       <div className="container mx-auto flex justify-between items-center">
         <a
-          href="#home"
+          href="/"
           className="text-2xl font-bold text-white flex items-center gap-2"
         >
-          <span className="text-gradient-purple">Nehemiah</span>
+          <span className="text-gradient-gold">Nehemiah</span>
         </a>
 
         {/* Desktop menu */}
@@ -59,7 +60,7 @@ const Navbar = () => {
             </a>
           ))}
           <a
-            href="#contact"
+            href="/#contact"
             className="button-primary ml-4"
           >
             Let's Talk
@@ -95,7 +96,7 @@ const Navbar = () => {
             </a>
           ))}
           <a
-            href="#contact"
+            href="/#contact"
             className="button-primary inline-block text-center mt-2"
             onClick={() => setIsMenuOpen(false)}
           >
