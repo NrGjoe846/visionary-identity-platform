@@ -1,5 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import AuthButton from "./AuthButton";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -59,12 +61,7 @@ const Navbar = () => {
               {link.name}
             </a>
           ))}
-          <a
-            href="/#contact"
-            className="button-primary ml-4"
-          >
-            Let's Talk
-          </a>
+          <AuthButton />
         </div>
 
         {/* Mobile menu button */}
@@ -95,13 +92,9 @@ const Navbar = () => {
               {link.name}
             </a>
           ))}
-          <a
-            href="/#contact"
-            className="button-primary inline-block text-center mt-2"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Let's Talk
-          </a>
+          <div className="mt-2">
+            <AuthButton />
+          </div>
         </div>
       </div>
     </nav>
