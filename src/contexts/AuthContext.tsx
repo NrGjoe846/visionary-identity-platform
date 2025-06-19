@@ -7,10 +7,13 @@ import {
   signInWithPopup, 
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  signInWithPhoneNumber,
+  ConfirmationResult,
+  RecaptchaVerifier
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db, googleProvider } from '@/config/firebase';
+import { auth, db, googleProvider, setupRecaptcha } from '@/config/firebase';
 
 interface UserProfile {
   uid: string;
@@ -19,6 +22,7 @@ interface UserProfile {
   firstName?: string;
   lastName?: string;
   photoURL?: string;
+  phoneNumber?: string;
   createdAt: Date;
 }
 
@@ -29,8 +33,11 @@ interface AuthContextType {
   signUp: (email: string, password: string, firstName?: string, lastName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithPhone: (phoneNumber: string) => Promise<{ confirmationResult?: ConfirmationResult; error: any }>;
+  verifyPhoneCode: (confirmationResult: ConfirmationResult, code: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<{ error: any }>;
+  setupPhoneRecaptcha: (containerId: string) => RecaptchaVerifier;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('Auth state changed:', user?.email);
+      console.log('Auth state changed:', user?.email || user?.phoneNumber);
       setUser(user);
       
       if (user) {
@@ -77,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           firstName: data.firstName,
           lastName: data.lastName,
           photoURL: data.photoURL,
+          phoneNumber: data.phoneNumber,
           createdAt: data.createdAt?.toDate() || new Date(),
         });
       }
@@ -91,13 +99,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
-        const { displayName, email, photoURL } = user;
+        const { displayName, email, photoURL, phoneNumber } = user;
         const createdAt = new Date();
 
         await setDoc(userRef, {
           displayName,
           email,
           photoURL,
+          phoneNumber,
           createdAt,
           ...additionalData,
         });
@@ -150,6 +159,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const setupPhoneRecaptcha = (containerId: string) => {
+    return setupRecaptcha(containerId);
+  };
+
+  const signInWithPhone = async (phoneNumber: string) => {
+    try {
+      const recaptchaVerifier = setupRecaptcha('recaptcha-container');
+      const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+      return { confirmationResult, error: null };
+    } catch (error: any) {
+      return { error };
+    }
+  };
+
+  const verifyPhoneCode = async (confirmationResult: ConfirmationResult, code: string) => {
+    try {
+      const { user } = await confirmationResult.confirm(code);
+      await createUserProfile(user);
+      return { error: null };
+    } catch (error: any) {
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
@@ -184,8 +217,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signIn,
     signInWithGoogle,
+    signInWithPhone,
+    verifyPhoneCode,
     signOut,
     updateUserProfile,
+    setupPhoneRecaptcha,
   };
 
   return (

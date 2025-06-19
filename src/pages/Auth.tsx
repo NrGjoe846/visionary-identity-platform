@@ -5,6 +5,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
+import PhoneSignInButton from '@/components/PhoneSignInButton';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,6 +15,7 @@ const Auth = () => {
   const [lastName, setLastName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'email' | 'google' | 'phone'>('email');
   
   const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
@@ -100,107 +102,146 @@ const Auth = () => {
           </p>
         </div>
 
-        {/* Google Sign In Button */}
-        <div className="mb-6">
-          <GoogleSignInButton />
-        </div>
-
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-golden/20"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-royal-black text-silver/70">Or continue with email</span>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {!isLogin && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
-                <input
-                  type="text"
-                  placeholder="First Name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
-                  required={!isLogin}
-                />
-              </div>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
-                <input
-                  type="text"
-                  placeholder="Last Name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
-                  required={!isLogin}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
-              required
-            />
-          </div>
-
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
-            <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-12 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
-              required
-              minLength={6}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-silver/50 hover:text-silver transition-colors"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-
+        {/* Authentication Method Selector */}
+        <div className="flex mb-6 bg-royal-black/30 rounded-lg p-1">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full button-primary py-3 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setAuthMethod('email')}
+            className={`flex-1 py-2 px-3 rounded-md text-sm transition-colors ${
+              authMethod === 'email' 
+                ? 'bg-golden text-royal-black font-semibold' 
+                : 'text-silver hover:text-white'
+            }`}
           >
-            {loading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-royal-black/30 border-t-royal-black rounded-full animate-spin"></div>
-                {isLogin ? 'Signing In...' : 'Creating Account...'}
-              </div>
-            ) : (
-              isLogin ? 'Sign In' : 'Create Account'
-            )}
+            Email
           </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-silver/70">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <button
-              onClick={toggleMode}
-              className="text-golden hover:text-golden/80 font-semibold ml-2 transition-colors"
-            >
-              {isLogin ? 'Sign Up' : 'Sign In'}
-            </button>
-          </p>
+          <button
+            onClick={() => setAuthMethod('google')}
+            className={`flex-1 py-2 px-3 rounded-md text-sm transition-colors ${
+              authMethod === 'google' 
+                ? 'bg-golden text-royal-black font-semibold' 
+                : 'text-silver hover:text-white'
+            }`}
+          >
+            Google
+          </button>
+          <button
+            onClick={() => setAuthMethod('phone')}
+            className={`flex-1 py-2 px-3 rounded-md text-sm transition-colors ${
+              authMethod === 'phone' 
+                ? 'bg-golden text-royal-black font-semibold' 
+                : 'text-silver hover:text-white'
+            }`}
+          >
+            Phone
+          </button>
         </div>
+
+        {/* Google Sign In */}
+        {authMethod === 'google' && (
+          <div className="mb-6">
+            <GoogleSignInButton />
+          </div>
+        )}
+
+        {/* Phone Sign In */}
+        {authMethod === 'phone' && (
+          <div className="mb-6">
+            <PhoneSignInButton />
+          </div>
+        )}
+
+        {/* Email Sign In Form */}
+        {authMethod === 'email' && (
+          <>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {!isLogin && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
+                    <input
+                      type="text"
+                      placeholder="First Name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
+                      required={!isLogin}
+                    />
+                  </div>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
+                    <input
+                      type="text"
+                      placeholder="Last Name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
+                      required={!isLogin}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
+                  required
+                />
+              </div>
+
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-12 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-silver/50 hover:text-silver transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full button-primary py-3 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-royal-black/30 border-t-royal-black rounded-full animate-spin"></div>
+                    {isLogin ? 'Signing In...' : 'Creating Account...'}
+                  </div>
+                ) : (
+                  isLogin ? 'Sign In' : 'Create Account'
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-silver/70">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                <button
+                  onClick={toggleMode}
+                  className="text-golden hover:text-golden/80 font-semibold ml-2 transition-colors"
+                >
+                  {isLogin ? 'Sign Up' : 'Sign In'}
+                </button>
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

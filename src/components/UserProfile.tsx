@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Calendar, Edit, Save, X, Camera } from 'lucide-react';
+import { User, Mail, Calendar, Edit, Save, X, Camera, Phone } from 'lucide-react';
 
 const UserProfile = () => {
   const { user, userProfile, updateUserProfile } = useAuth();
@@ -110,13 +110,25 @@ const UserProfile = () => {
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <Mail className="text-golden" size={20} />
-          <div>
-            <p className="text-silver/70 text-sm">Email</p>
-            <p className="text-white">{user.email}</p>
+        {user.email && (
+          <div className="flex items-center gap-3">
+            <Mail className="text-golden" size={20} />
+            <div>
+              <p className="text-silver/70 text-sm">Email</p>
+              <p className="text-white">{user.email}</p>
+            </div>
           </div>
-        </div>
+        )}
+
+        {user.phoneNumber && (
+          <div className="flex items-center gap-3">
+            <Phone className="text-golden" size={20} />
+            <div>
+              <p className="text-silver/70 text-sm">Phone Number</p>
+              <p className="text-white">{user.phoneNumber}</p>
+            </div>
+          </div>
+        )}
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
