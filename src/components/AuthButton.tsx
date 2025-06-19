@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
 const AuthButton = () => {
-  const { user, signOut } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showDropdown, setShowDropdown] = useState(false);
@@ -41,15 +41,25 @@ const AuthButton = () => {
     );
   }
 
+  const displayName = userProfile?.displayName || user.displayName || user.email?.split('@')[0] || 'User';
+
   return (
     <div className="relative">
       <button
         onClick={() => setShowDropdown(!showDropdown)}
         className="flex items-center gap-2 text-silver hover:text-white transition-colors duration-300"
       >
-        <UserCircle size={24} />
+        {user.photoURL ? (
+          <img 
+            src={user.photoURL} 
+            alt="Profile" 
+            className="w-6 h-6 rounded-full"
+          />
+        ) : (
+          <UserCircle size={24} />
+        )}
         <span className="hidden sm:block">
-          {user.email?.split('@')[0]}
+          {displayName}
         </span>
       </button>
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -45,13 +46,13 @@ const Auth = () => {
         }
         toast({
           title: "Account created!",
-          description: "Please check your email to verify your account.",
+          description: "Your account has been created successfully.",
         });
       }
     } catch (error: any) {
       toast({
         title: "Authentication Error",
-        description: error.message,
+        description: error.message || "An error occurred during authentication.",
         variant: "destructive",
       });
     } finally {
@@ -97,6 +98,20 @@ const Auth = () => {
               : 'Join us and start your journey'
             }
           </p>
+        </div>
+
+        {/* Google Sign In Button */}
+        <div className="mb-6">
+          <GoogleSignInButton />
+        </div>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-golden/20"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-royal-black text-silver/70">Or continue with email</span>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

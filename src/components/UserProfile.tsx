@@ -1,73 +1,31 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Calendar, Edit, Save, X } from 'lucide-react';
-
-interface Profile {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;
-  created_at: string;
-}
+import { User, Mail, Calendar, Edit, Save, X, Camera } from 'lucide-react';
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, userProfile, updateUserProfile } = useAuth();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
+    firstName: userProfile?.firstName || '',
+    lastName: userProfile?.lastName || '',
+    displayName: userProfile?.displayName || '',
   });
 
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
-    }
-  }, [user]);
-
-  const fetchProfile = async () => {
+  const handleUpdateProfile = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user?.id)
-        .single();
-
-      if (error) throw error;
-      setProfile(data);
-      setFormData({
-        first_name: data.first_name || '',
-        last_name: data.last_name || '',
+      const { error } = await updateUserProfile({
+        ...formData,
+        displayName: `${formData.firstName} ${formData.lastName}`.trim() || formData.displayName,
       });
-    } catch (error: any) {
-      toast({
-        title: "Error loading profile",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const updateProfile = async () => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(formData)
-        .eq('id', user?.id);
+      if (error) {
+        throw error;
+      }
 
-      if (error) throw error;
-
-      setProfile(prev => prev ? { ...prev, ...formData } : null);
       setEditing(false);
-      
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -81,23 +39,10 @@ const UserProfile = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="glass-card p-6 animate-pulse">
-        <div className="h-6 bg-golden/20 rounded mb-4"></div>
-        <div className="space-y-3">
-          <div className="h-4 bg-golden/20 rounded"></div>
-          <div className="h-4 bg-golden/20 rounded"></div>
-          <div className="h-4 bg-golden/20 rounded w-3/4"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!profile) {
+  if (!user) {
     return (
       <div className="glass-card p-6 text-center">
-        <p className="text-silver/70">Profile not found</p>
+        <p className="text-silver/70">Please sign in to view your profile</p>
       </div>
     );
   }
@@ -111,7 +56,14 @@ const UserProfile = () => {
         </h2>
         {!editing ? (
           <button
-            onClick={() => setEditing(true)}
+            onClick={() => {
+              setFormData({
+                firstName: userProfile?.firstName || '',
+                lastName: userProfile?.lastName || '',
+                displayName: userProfile?.displayName || user.displayName || '',
+              });
+              setEditing(true);
+            }}
             className="button-secondary flex items-center gap-2"
           >
             <Edit size={16} />
@@ -120,20 +72,14 @@ const UserProfile = () => {
         ) : (
           <div className="flex gap-2">
             <button
-              onClick={updateProfile}
+              onClick={handleUpdateProfile}
               className="button-primary flex items-center gap-2"
             >
               <Save size={16} />
               Save
             </button>
             <button
-              onClick={() => {
-                setEditing(false);
-                setFormData({
-                  first_name: profile.first_name || '',
-                  last_name: profile.last_name || '',
-                });
-              }}
+              onClick={() => setEditing(false)}
               className="button-secondary flex items-center gap-2"
             >
               <X size={16} />
@@ -143,12 +89,32 @@ const UserProfile = () => {
         )}
       </div>
 
+      {/* Profile Picture */}
+      <div className="flex justify-center mb-6">
+        <div className="relative">
+          {user.photoURL ? (
+            <img
+              src={user.photoURL}
+              alt="Profile"
+              className="w-24 h-24 rounded-full border-2 border-golden/30"
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-golden/20 flex items-center justify-center border-2 border-golden/30">
+              <User size={32} className="text-golden" />
+            </div>
+          )}
+          <button className="absolute bottom-0 right-0 bg-golden text-royal-black p-2 rounded-full hover:bg-golden/80 transition-colors">
+            <Camera size={16} />
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <Mail className="text-golden" size={20} />
           <div>
             <p className="text-silver/70 text-sm">Email</p>
-            <p className="text-white">{profile.email}</p>
+            <p className="text-white">{user.email}</p>
           </div>
         </div>
 
@@ -158,13 +124,13 @@ const UserProfile = () => {
             {editing ? (
               <input
                 type="text"
-                value={formData.first_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                value={formData.firstName}
+                onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                 className="w-full bg-royal-black/50 border border-golden/20 rounded-lg px-3 py-2 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
                 placeholder="Enter first name"
               />
             ) : (
-              <p className="text-white">{profile.first_name || 'Not set'}</p>
+              <p className="text-white">{userProfile?.firstName || 'Not set'}</p>
             )}
           </div>
 
@@ -173,30 +139,47 @@ const UserProfile = () => {
             {editing ? (
               <input
                 type="text"
-                value={formData.last_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                value={formData.lastName}
+                onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
                 className="w-full bg-royal-black/50 border border-golden/20 rounded-lg px-3 py-2 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
                 placeholder="Enter last name"
               />
             ) : (
-              <p className="text-white">{profile.last_name || 'Not set'}</p>
+              <p className="text-white">{userProfile?.lastName || 'Not set'}</p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Calendar className="text-golden" size={20} />
-          <div>
-            <p className="text-silver/70 text-sm">Member Since</p>
-            <p className="text-white">
-              {new Date(profile.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </p>
-          </div>
+        <div>
+          <label className="text-silver/70 text-sm block mb-2">Display Name</label>
+          {editing ? (
+            <input
+              type="text"
+              value={formData.displayName}
+              onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+              className="w-full bg-royal-black/50 border border-golden/20 rounded-lg px-3 py-2 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
+              placeholder="Enter display name"
+            />
+          ) : (
+            <p className="text-white">{userProfile?.displayName || user.displayName || 'Not set'}</p>
+          )}
         </div>
+
+        {user.metadata?.creationTime && (
+          <div className="flex items-center gap-3">
+            <Calendar className="text-golden" size={20} />
+            <div>
+              <p className="text-silver/70 text-sm">Member Since</p>
+              <p className="text-white">
+                {new Date(user.metadata.creationTime).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
