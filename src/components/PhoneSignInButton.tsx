@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +15,51 @@ const PhoneSignInButton = () => {
   const { signInWithPhone, verifyPhoneCode } = useAuth();
   const { toast } = useToast();
 
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digit characters
+    const digits = value.replace(/\D/g, '');
+    
+    // If it doesn't start with a country code, assume it's Indian number
+    if (digits.length === 10 && !digits.startsWith('91')) {
+      return `+91${digits}`;
+    }
+    
+    // If it starts with 91 but no +, add the +
+    if (digits.startsWith('91') && digits.length === 12) {
+      return `+${digits}`;
+    }
+    
+    // If it already has +, return as is
+    if (value.startsWith('+')) {
+      return `+${digits}`;
+    }
+    
+    // For other international numbers, add + if not present
+    return digits.length > 0 ? `+${digits}` : '';
+  };
+
+  const validatePhoneNumber = (phone: string) => {
+    // Remove + and check if it's a valid format
+    const digits = phone.replace(/^\+/, '');
+    
+    // Indian number validation (91 + 10 digits)
+    if (digits.startsWith('91') && digits.length === 12) {
+      return true;
+    }
+    
+    // Other international numbers (minimum 10 digits, maximum 15)
+    if (digits.length >= 10 && digits.length <= 15) {
+      return true;
+    }
+    
+    return false;
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setPhoneNumber(formatted);
+  };
+
   const handlePhoneSignIn = async () => {
     if (!phoneNumber) {
       toast({
@@ -26,8 +70,18 @@ const PhoneSignInButton = () => {
       return;
     }
 
+    if (!validatePhoneNumber(phoneNumber)) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid phone number with country code (e.g., +91 for India).",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
+      console.log('Attempting to sign in with phone:', phoneNumber);
       const { confirmationResult, error } = await signInWithPhone(phoneNumber);
       if (error) {
         throw error;
@@ -43,9 +97,10 @@ const PhoneSignInButton = () => {
         });
       }
     } catch (error: any) {
+      console.error('Phone sign in error:', error);
       toast({
         title: "Phone Sign In Error",
-        description: error.message || "Failed to send verification code.",
+        description: error.message || "Failed to send verification code. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -65,6 +120,7 @@ const PhoneSignInButton = () => {
 
     setLoading(true);
     try {
+      console.log('Verifying OTP:', otp);
       const { error } = await verifyPhoneCode(confirmationResult, otp);
       if (error) {
         throw error;
@@ -74,9 +130,10 @@ const PhoneSignInButton = () => {
         description: "You have successfully signed in with your phone number.",
       });
     } catch (error: any) {
+      console.error('OTP verification error:', error);
       toast({
         title: "Verification Error",
-        description: error.message || "Invalid verification code.",
+        description: error.message || "Invalid verification code. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -152,11 +209,15 @@ const PhoneSignInButton = () => {
           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-silver/50" size={18} />
           <input
             type="tel"
-            placeholder="+1 (555) 123-4567"
+            placeholder="+91 98765 43210"
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={(e) => handlePhoneChange(e.target.value)}
             className="w-full bg-royal-black/50 border border-golden/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-silver/50 focus:outline-none focus:border-golden/50 transition-colors"
           />
+        </div>
+        
+        <div className="text-xs text-silver/60 mb-2">
+          Enter your phone number with country code (e.g., +91 for India)
         </div>
         
         <div className="flex gap-2">
